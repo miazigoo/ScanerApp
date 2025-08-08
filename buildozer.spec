@@ -14,7 +14,7 @@ android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,ACCE
 # Стабильные версии для CI
 android.api = 28
 android.minapi = 21
-android.ndk = 21e
+android.ndk = 25b
 android.sdk = 28
 android.accept_sdk_license = True
 
