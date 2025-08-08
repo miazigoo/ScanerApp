@@ -1,0 +1,162 @@
+ScreenManager:
+    id: screen_manager
+    MainScreen:
+        id: main_screen
+    BarcodeListScreen:
+        id: barcode_list
+        name: "history"
+    LoginScreen:
+        id: login_screen
+        name: "login"
+    OrderSelectScreen:
+        id: order_select_screen
+        name: "order_select"
+    SettingsScreen: 
+        id: settings_screen
+        name: "settings"
+
+
+<MainScreen>:
+    user_display: ""
+    order_display: ""
+    stage_display: ""
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: dp(16)
+        spacing: dp(16)
+
+        MDTopAppBar:
+            title: "Сканер штрих-кодов"
+            left_action_items: [["menu", lambda x: root.open_menu()]]
+            md_bg_color: app.theme_cls.primary_color
+
+        MDCard:
+            orientation: 'horizontal'
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: dp(56)
+            elevation: 6
+            MDIcon:
+                icon: "account-circle"
+                theme_text_color: 'Custom'
+                text_color: app.theme_cls.primary_color
+                size_hint_x: None
+                width: dp(36)
+            MDLabel:
+                text: "Пользователь: [b]{}[/b]".format(root.user_display)
+                markup: True
+                theme_text_color: 'Primary'
+                font_style: 'Subtitle1'
+            MDRaisedButton:
+                text: "Сменить"
+                icon: 'logout'
+                md_bg_color: app.theme_cls.primary_light
+                on_release: root.change_user()
+
+        MDCard:
+            orientation: 'horizontal'
+            padding: dp(10)
+            spacing: dp(16)
+            size_hint_y: None
+            height: dp(56)
+            elevation: 6
+            MDIcon:
+                icon: 'package-variant'
+                theme_text_color: 'Custom'
+                text_color: app.theme_cls.primary_color
+                size_hint_x: None
+                width: dp(36)
+            MDLabel:
+                text: "Заказ: [b]{}[/b]".format(root.order_display)
+                markup: True
+                theme_text_color: "Primary"
+                font_style: "Subtitle1"
+            MDRaisedButton:
+                text: "Выбрать заказ"
+                icon: "magnify"
+                md_bg_color: app.theme_cls.primary_light
+                on_release: root.select_order()
+            MDIcon:
+                icon: "format-list-bulleted-type"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+                size_hint_x: None
+                width: dp(36)
+            MDLabel:
+                text: "Этап: [b]{}[/b]".format(root.stage_display)
+                markup: True
+                theme_text_color: "Primary"
+                font_style: "Subtitle1"
+            MDRaisedButton:
+                text: "Выбрать этап"
+                icon: "format-list-bulleted"
+                md_bg_color: app.theme_cls.primary_light
+                on_release: root.select_stage()
+        
+        MDCard:
+            id: stage_card
+            orientation: 'horizontal'
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: dp(56)
+            elevation: 6
+
+            MDIcon:
+                icon: "state-machine"
+                theme_text_color: 'Custom'
+                text_color: app.theme_cls.primary_color
+                size_hint_x: None
+                width: dp(36)
+
+            MDLabel:
+                text: "Состояние:"
+                size_hint_x: None
+                width: dp(90)
+                theme_text_color: "Primary"
+                bold: True
+
+            MDRaisedButton:
+                id: state_btn
+                text: "[b]Is Good[/b]" if root.is_good_state else "[b]Is Defect[/b]"
+                icon: "checkbox-marked-circle" if root.is_good_state else "alert-circle"
+                md_bg_color: app.theme_cls.primary_light
+                text_color: (0, 0.3, 0, 1) if root.is_good_state else (0.8, 0, 0, 1)
+                on_release: root.open_state_popup()
+                disabled: not root.is_repair_stage()
+
+        MDTextField:
+            id: barcode_input
+            hint_text: "Введите или сканируйте штрих-код"
+            helper_text_mode: "persistent"
+            font_size: dp(24)
+            hint_text_font_size: dp(24)
+            pos_hint: {"center_x": .5}
+            mode: "rectangle"
+            multiline: False
+            on_focus: True
+            on_text: root.on_barcode_text(self.text)
+            on_text_validate: root.process_barcode(self.text)
+
+        MDLabel:
+            id: save_status
+            text: ""
+            halign: "center"
+            font_style: "H6"
+            theme_text_color: "Custom"
+            text_color: root.status_color
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: dp(12)
+            MDRaisedButton:
+                text: "Сканировать"
+                icon: "barcode-scan"
+                on_release: root.focus_barcode()
+            MDRaisedButton:
+                text: "Меню"
+                icon: "cog"
+                on_release: root.open_menu()

@@ -1,0 +1,108 @@
+<SettingsScreen@Screen>:
+    name: "settings"
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: dp(16)
+        spacing: dp(16)
+
+        MDTopAppBar:
+            title: "Настройки"
+            md_bg_color: app.theme_cls.primary_color
+
+        MDCard:
+            orientation: 'vertical'
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+            elevation: 6
+
+            MDLabel:
+                text: "Тема оформления"
+                font_style: "H6"
+                halign: "center"
+                size_hint_y: None
+                height: dp(32)
+            
+            MDBoxLayout:
+                orientation: "horizontal"
+                spacing: dp(16)
+                size_hint_y: None
+                height: dp(48)
+                MDRaisedButton:
+                    text: "Тёмная"
+                    md_bg_color: app.theme_cls.primary_dark if app.theme_cls.theme_style == "Dark" else app.theme_cls.primary_light
+                    text_color: (1, 1, 1, 1) if app.theme_cls.theme_style == "Dark" else (0,0,0,1)
+                    on_release:
+                        app.theme_cls.theme_style = "Dark"
+                        app.current_custom_theme = "Dark"
+                        app.save_theme_settings()
+                MDRaisedButton:
+                    text: "Светлая"
+                    md_bg_color: app.theme_cls.primary_light if app.theme_cls.theme_style == "Light" else app.theme_cls.primary_dark
+                    text_color: (0,0,0,1) if app.theme_cls.theme_style == "Light" else (1,1,1,1)
+                    on_release:
+                        app.theme_cls.theme_style = "Light"
+                        app.current_custom_theme = "Light"
+                        app.save_theme_settings()
+
+        MDCard:
+            orientation: 'vertical'
+            padding: dp(16)
+            spacing: dp(16)
+            size_hint_y: None
+            height: self.minimum_height
+            elevation: 6
+
+            MDLabel:
+                text: "Основной цвет"
+                font_style: "Subtitle1"
+                halign: "center"
+                size_hint_y: None
+                height: dp(32)
+            
+            MDGridLayout:
+                cols: 5
+                adaptive_height: True
+                spacing: dp(8)
+                MDRaisedButton:
+                    md_bg_color: (33/255, 150/255, 243/255, 1)
+                    text: ""
+                    on_release: 
+                        app.theme_cls.primary_palette = "Blue"
+                        app.save_theme_settings()
+                MDRaisedButton:
+                    md_bg_color: (244/255, 67/255, 54/255, 1)
+                    text: ""
+                    on_release: 
+                        app.theme_cls.primary_palette = "Red"
+                        app.save_theme_settings()
+                MDRaisedButton:
+                    md_bg_color: (76/255, 175/255, 80/255, 1)
+                    text: ""
+                    on_release: 
+                        app.theme_cls.primary_palette = "Green"
+                        app.save_theme_settings()
+                MDRaisedButton:
+                    md_bg_color: (255/255, 152/255, 0, 1)
+                    text: ""
+                    on_release: 
+                        app.theme_cls.primary_palette = "Orange"
+                        app.save_theme_settings()
+                MDRaisedButton:
+                    md_bg_color: (156/255, 39/255, 176/255, 1)
+                    text: ""
+                    on_release: 
+                        app.theme_cls.primary_palette = "Purple"
+                        app.save_theme_settings()
+
+        Widget:
+
+        MDRaisedButton:
+            text: "Назад"
+            icon: "arrow-left"
+            size_hint_x: None
+            width: dp(140)
+            pos_hint: {"center_x": .5}
+            on_release: app.root.current = "main"

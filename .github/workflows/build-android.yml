@@ -1,0 +1,128 @@
+name: Build Android APK
+
+on:
+  # Запуск при push в main ветку
+  push:
+    branches: [ main, master ]
+
+  # Запуск при создании pull request
+  pull_request:
+    branches: [ main, master ]
+
+  # Возможность запуска вручную
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-20.04
+
+    steps:
+    # Шаг 1: Получаем код из репозитория
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Шаг 2: Настраиваем Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    # Шаг 3: Кэшируем зависимости Python
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    # Шаг 4: Устанавливаем системные зависимости
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          python3-pip \
+          build-essential \
+          git \
+          ffmpeg \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libsdl2-mixer-dev \
+          libsdl2-ttf-dev \
+          libportmidi-dev \
+          libswscale-dev \
+          libavformat-dev \
+          libavcodec-dev \
+          zlib1g-dev \
+          libgstreamer1.0 \
+          gstreamer1.0-plugins-base \
+          gstreamer1.0-plugins-good
+
+    # Шаг 5: Устанавливаем Java (нужен для Android SDK)
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+
+    # Шаг 6: Кэшируем buildozer
+    - name: Cache buildozer global directory
+      uses: actions/cache@v3
+      with:
+        path: ~/.buildozer
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-
+
+    # Шаг 7: Кэшируем локальную директорию buildozer
+    - name: Cache buildozer directory
+      uses: actions/cache@v3
+      with:
+        path: .buildozer
+        key: ${{ runner.os }}-buildozer-local-${{ hashFiles('buildozer.spec') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-local-
+
+    # Шаг 8: Устанавливаем Python зависимости
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install buildozer
+        pip install cython==0.29.33
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # Шаг 9: Подготавливаем buildozer.spec для CI
+    - name: Prepare buildozer.spec
+      run: |
+        # Убеждаемся что используем правильные настройки для CI
+        sed -i 's/log_level = 2/log_level = 1/' buildozer.spec
+        sed -i 's/warn_on_root = 1/warn_on_root = 0/' buildozer.spec
+
+    # Шаг 10: Собираем APK
+    - name: Build APK with buildozer
+      run: |
+        # Принимаем лицензии Android SDK
+        yes | buildozer android debug
+      env:
+        # Переменные окружения для buildozer
+        ANDROID_SDK_ROOT: /opt/android-sdk
+        ANDROID_HOME: /opt/android-sdk
+
+    # Шаг 11: Загружаем собранный APK как артефакт
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: android-apk-${{ github.run_number }}
+        path: bin/*.apk
+        retention-days: 30
+
+    # Шаг 12: Показываем информацию о собранном файле
+    - name: Show APK info
+      run: |
+        if [ -f bin/*.apk ]; then
+          ls -la bin/
+          echo "APK successfully built!"
+        else
+          echo "No APK file found"
+          exit 1
+        fi

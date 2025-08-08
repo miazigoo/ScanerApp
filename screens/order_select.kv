@@ -1,0 +1,84 @@
+<OrderListItem@OneLineAvatarIconListItem>:
+    order_id: 0
+    is_selected: False
+    hovered: False
+    text_color: app.theme_cls.text_color
+    on_release: app.root.get_screen("order_select").select_order(root.order_id)
+    on_enter: self.hovered = True
+    on_leave: self.hovered = False
+    canvas.before:
+        Color:
+            rgba:
+                (0.2, 0.5, 0.8, 0.3) if root.is_selected else \
+                (0.3, 0.3, 0.5, 0.2) if root.hovered else \
+                (0, 0, 0, 0)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    IconLeftWidget:
+        icon: "check-circle" if root.is_selected else "checkbox-blank-circle-outline"
+        theme_text_color: "Custom"
+        text_color: (0, 0.8, 0.3, 1) if root.is_selected else (0.5, 0.5, 0.5, 1)
+
+<OrderSelectScreen@Screen>:
+    name: "order_select"
+
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            title: "Выбор заказа"
+            left_action_items: [["arrow-left", lambda x: setattr(app.root, "current", "main")]]
+            md_bg_color: app.theme_cls.primary_color
+            elevation: 4
+            specific_text_color: 1, 1, 1, 1
+
+        MDBoxLayout:
+            orientation: "vertical"
+            spacing: dp(16)
+            padding: [dp(16), 0, dp(16), dp(16)]
+
+            MDCard:
+                orientation: 'vertical'
+                padding: dp(12)
+                spacing: dp(8)
+                size_hint_y: 1
+                elevation: 2
+                md_bg_color: app.theme_cls.bg_normal
+
+                MDTextField:
+                    id: search_field
+                    hint_text: 'Поиск заказа'
+                    on_focus: True
+                    on_text: root.filter_orders(self.text)
+                    size_hint_y: None
+                    height: dp(56)
+                    mode: "fill"
+                    fill_color: app.theme_cls.bg_normal
+                    text_color: app.theme_cls.text_color
+                    hint_text_color: app.theme_cls.text_color
+                    cursor_color: app.theme_cls.primary_color
+
+                RecycleView:
+                    id: order_rv
+                    key_viewclass: "viewclass"
+                    key_size: "height"
+                    viewclass: "OrderListItem"
+                    size_hint_y: 1
+                    bar_width: dp(4)
+                    bar_color: app.theme_cls.primary_light if app.theme_cls.theme_style == "Light" else app.theme_cls.primary_dark
+                    RecycleBoxLayout:
+                        default_size: None, dp(56)
+                        default_size_hint: 1, None
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: "vertical"
+
+            MDBoxLayout:
+                size_hint_y: None
+                height: dp(56)
+                spacing: dp(12)
+                MDRaisedButton:
+                    text: "Назад"
+                    icon: "arrow-left"
+                    on_release: app.root.current = 'main'

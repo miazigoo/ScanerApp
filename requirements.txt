@@ -1,0 +1,5 @@
+Kivy==2.3.1
+kivymd==1.2.0
+SQLAlchemy==2.0.41
+pydantic>=2.0
+requests==2.32.4

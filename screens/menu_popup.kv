@@ -1,0 +1,41 @@
+<MenuPopup@MDBoxLayout>:
+    orientation: "vertical"
+    padding: dp(24)
+    spacing: dp(12)
+    size_hint_y: None
+    height: self.minimum_height
+    canvas.before:
+        # Color:
+        #     rgba: 1, 0.85, 0.7, 1   # бежево-оранжевый фон
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [16, 16, 16, 16]
+
+    MDLabel:
+        text: "Меню"
+        font_style: "H6"
+        halign: "center"
+        size_hint_y: None
+        height: dp(48)
+    MDSeparator:
+        height: dp(1)
+
+    MDRaisedButton:
+        text: "История"
+        icon: "history"
+        on_release:
+            app.show_history()
+            app.dismiss_menu_popup()
+    MDRaisedButton:
+        text: "Настройки"
+        icon: "cog"
+        on_release:
+            app.show_settings()
+            app.dismiss_menu_popup()
+    MDRaisedButton:
+        text: "Выйти"
+        icon: "logout"
+        on_release:
+            app.logout()
+            app.dismiss_menu_popup()
